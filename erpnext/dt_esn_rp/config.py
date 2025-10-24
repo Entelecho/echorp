@@ -5,9 +5,9 @@ This module provides configuration management and integration hooks
 for the Deep Tree Echo State Network Reservoir P-System framework.
 """
 
-import frappe
-from typing import Dict, Any, Optional
+from typing import Any, Optional
 
+import frappe
 
 DEFAULT_CONFIG = {
 	"reservoir": {
@@ -40,46 +40,46 @@ DEFAULT_CONFIG = {
 }
 
 
-def get_framework_config() -> Dict[str, Any]:
+def get_framework_config() -> dict[str, Any]:
 	"""
 	Get DT-(ESN)-RP framework configuration.
-	
+
 	Returns configuration from site config or defaults.
-	
+
 	Returns:
 		Configuration dictionary
 	"""
 	site_config = frappe.get_site_config()
 	dt_esn_rp_config = site_config.get("dt_esn_rp", {})
-	
+
 	# Merge with defaults
 	config = DEFAULT_CONFIG.copy()
 	for key in config:
 		if key in dt_esn_rp_config:
 			config[key].update(dt_esn_rp_config[key])
-	
+
 	return config
 
 
-def initialize_framework(config: Optional[Dict[str, Any]] = None) -> "DeepTreeESNRP":
+def initialize_framework(config: dict[str, Any] | None = None):
 	"""
 	Initialize DT-(ESN)-RP framework with configuration.
-	
+
 	Args:
 		config: Optional configuration dictionary
-		
+
 	Returns:
 		Initialized framework instance
 	"""
 	from .core import DeepTreeESNRP
-	
+
 	if config is None:
 		config = get_framework_config()
-	
+
 	reservoir_config = config["reservoir"]
 	p_system_config = config["p_system"]
 	affective_config = config["affective_agency"]
-	
+
 	framework = DeepTreeESNRP(
 		reservoir_size=reservoir_config["size"],
 		spectral_radius=reservoir_config["spectral_radius"],
@@ -88,21 +88,21 @@ def initialize_framework(config: Optional[Dict[str, Any]] = None) -> "DeepTreeES
 		membrane_layers=p_system_config["num_membranes"],
 		enable_affective_resonance=affective_config["enable"],
 	)
-	
+
 	frappe.logger().info("DT-(ESN)-RP Framework initialized with configuration")
-	
+
 	return framework
 
 
-def get_framework_status() -> Dict[str, Any]:
+def get_framework_status() -> dict[str, Any]:
 	"""
 	Get status information about the framework.
-	
+
 	Returns:
 		Status dictionary
 	"""
 	config = get_framework_config()
-	
+
 	return {
 		"enabled": True,
 		"version": "1.0.0",
@@ -121,7 +121,7 @@ def get_framework_status() -> Dict[str, Any]:
 def get_framework_info():
 	"""
 	API endpoint to get framework information.
-	
+
 	Returns:
 		Framework information as JSON
 	"""
@@ -132,26 +132,27 @@ def get_framework_info():
 def process_with_framework(input_data: str):
 	"""
 	API endpoint to process data through the framework.
-	
+
 	Args:
 		input_data: JSON string of input data
-		
+
 	Returns:
 		Processing results as JSON
 	"""
 	import json
+
 	import numpy as np
-	
+
 	# Parse input
 	data = json.loads(input_data)
 	input_array = np.array(data)
-	
+
 	# Initialize framework
 	framework = initialize_framework()
-	
+
 	# Process data
 	result = framework.process(input_array)
-	
+
 	# Convert numpy arrays to lists for JSON serialization
 	serializable_result = {}
 	for key, value in result.items():
@@ -166,5 +167,5 @@ def process_with_framework(input_data: str):
 					serializable_result[key][k] = v
 		else:
 			serializable_result[key] = value
-	
+
 	return serializable_result

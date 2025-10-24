@@ -15,14 +15,14 @@ Enterprise=ESN, Resources=Reservoirs, Planning=P-System Membrane Computing
 
 __version__ = "1.0.0"
 
+from .affective_agency import AffectiveAgency
 from .core import DeepTreeESNRP
 from .esn_reservoir import EchoStateNetworkReservoir
 from .p_system import PSystemMembraneComputing
-from .affective_agency import AffectiveAgency
 
 __all__ = [
+	"AffectiveAgency",
 	"DeepTreeESNRP",
 	"EchoStateNetworkReservoir",
 	"PSystemMembraneComputing",
-	"AffectiveAgency",
 ]
